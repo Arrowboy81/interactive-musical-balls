@@ -17,7 +17,7 @@ overlay.style.color = '#9BA0BC';
 overlay.innerHTML = `
     <div style="text-align: center; padding: 20px;">
         <h2 style="font-size: 24px; margin-bottom: 10px; color: #8B95C9;">Click or Touch to Start</h2>
-        <p style="font-size: 16px; opacity: 0.8;">Experience interactive musical physics</p>
+        <p style="font-size: 16px; opacity: 0.8;">Set the orbs in motion.</p>
     </div>
 `;
 document.body.appendChild(overlay);
@@ -90,7 +90,7 @@ const CHORD_PROGRESSIONS = {
 
 // Keep track of last chord time
 let lastChordTime = 0;
-const CHORD_INTERVAL = 2000; // Minimum time between chords in milliseconds
+const CHORD_INTERVAL = 3000; // Longer minimum time between chords (3 seconds)
 
 // Initialize audio with Tone.js
 function initAudio() {
@@ -100,13 +100,13 @@ function initAudio() {
         synth = new Tone.PolySynth(Tone.Synth, {
             oscillator: {
                 type: 'sine',
-                partials: [1, 0.1, 0.05, 0.02]  // Even fewer harmonics for purer tone
+                partials: [1, 0.05, 0.02, 0.01]  // Even fewer harmonics for purest tone
             },
             envelope: {
-                attack: 0.15,     // Longer attack for softer onset
-                decay: 1.2,       // Longer decay
-                sustain: 0.05,    // Lower sustain for more ethereal fade
-                release: 1.8      // Longer release for ethereal tail
+                attack: 0.3,      // Even longer attack for softer onset
+                decay: 2.2,       // Longer decay for more floating sound
+                sustain: 0.02,    // Lower sustain for more ethereal fade
+                release: 2.8      // Longer release for meditation
             }
         }).toDestination();
 
@@ -114,57 +114,57 @@ function initAudio() {
         bassSynth = new Tone.Synth({
             oscillator: {
                 type: 'sine',
-                partials: [1, 0.2, 0.05]  // Even simpler harmonics
+                partials: [1, 0.05, 0.01]  // Even simpler harmonics for gentler bass
             },
             envelope: {
-                attack: 0.12,    // Longer attack
-                decay: 0.4,      // Same decay
-                sustain: 0.15,   // Lower sustain
-                release: 0.8     // Same release
+                attack: 0.35,    // Longer attack for softer bass
+                decay: 0.8,      // Longer decay
+                sustain: 0.08,   // Lower sustain
+                release: 1.5     // Longer release
             }
         }).toDestination();
 
         console.log('Creating effects...');
         // Create large reverb effect
         reverb = new Tone.Reverb({
-            decay: 15.0,        // Even longer decay
-            wet: 0.95,          // More reverb mix
-            preDelay: 0.4       // More pre-delay for spaciousness
+            decay: 20.0,        // Even longer decay for more space
+            wet: 0.99,          // More reverb mix
+            preDelay: 0.6       // More pre-delay for dreamier sound
         }).toDestination();
 
         // Create subtle delay effect
         delay = new Tone.FeedbackDelay({
             delayTime: "8n",
-            feedback: 0.15,    // Less feedback for cleaner sound
-            wet: 0.4          // More delay mix
+            feedback: 0.08,    // Less feedback for cleaner sound
+            wet: 0.5          // More delay mix
         }).connect(reverb);
 
         // Add a high shelf filter to enhance sparkle
         const highShelf = new Tone.Filter({
             frequency: 4000,   // Higher frequency
             type: "highshelf",
-            gain: 2           // Less gain for gentler highs
+            gain: 1.5         // Less gain for gentler highs
         }).toDestination();
 
         // Add a low shelf filter to enhance warmth
         const lowShelf = new Tone.Filter({
             frequency: 200,    // Lower frequency
             type: "lowshelf",
-            gain: 2           // Less gain for gentler lows
+            gain: 1.5         // Less gain for gentler lows
         }).toDestination();
 
         // Add a notch filter to reduce mids
         const notch = new Tone.Filter({
             frequency: 800,
             type: "notch",
-            Q: 2.5            // Sharper notch
+            Q: 2.8            // Sharper notch
         }).toDestination();
 
         // Add a second notch filter for wider mid reduction
         const notch2 = new Tone.Filter({
             frequency: 1500,   // Higher frequency for second notch
             type: "notch",
-            Q: 2.0
+            Q: 2.2
         }).toDestination();
 
         // Connect synth to effects chain
@@ -175,8 +175,8 @@ function initAudio() {
         synth.connect(delay);
         synth.connect(reverb);
 
-        // Set overall volume
-        Tone.Destination.volume.value = -24; // Even lower volume
+        // Set overall volume even lower
+        Tone.Destination.volume.value = -32; // Much lower volume
         
         // Test sound
         console.log('Playing test note...');
@@ -200,12 +200,12 @@ function createCollisionSound(velocity, x, y) {
         
         // Play deep bass note every 16 collisions
         if (totalCollisions % 16 === 0) {
-            bassSynth.triggerAttackRelease("C2", "4n", Tone.now(), 0.6);
+            bassSynth.triggerAttackRelease("C2", "4n", Tone.now(), 0.4);
             console.log('Playing bass note');
         }
 
         const currentTime = Date.now();
-        const shouldPlayChord = currentTime - lastChordTime > CHORD_INTERVAL && Math.random() < 0.3;
+        const shouldPlayChord = currentTime - lastChordTime > CHORD_INTERVAL && Math.random() < 0.2;
 
         if (shouldPlayChord) {
             // Play a chord
@@ -214,7 +214,7 @@ function createCollisionSound(velocity, x, y) {
             const chordNotes = CHORD_PROGRESSIONS[selectedChord];
             
             // Play chord with slightly lower volume
-            const chordVolume = Math.min(0.12, Math.abs(velocity) * 0.0015);
+            const chordVolume = Math.min(0.05, Math.abs(velocity) * 0.0008);  // Lower chord volume
             chordNotes.forEach((note, i) => {
                 // Stagger the notes slightly for a more natural sound
                 synth.triggerAttackRelease(note, "2n", Tone.now() + i * 0.02, chordVolume);
@@ -242,7 +242,7 @@ function createCollisionSound(velocity, x, y) {
         const note = C_MAJOR_SCALE[noteIndex];
         
         // Calculate volume based on velocity (very gentle)
-        const volume = Math.min(0.2, Math.abs(velocity) * 0.002);  // Lower maximum volume and sensitivity
+        const volume = Math.min(0.1, Math.abs(velocity) * 0.001);  // Even lower maximum volume
         
         // Play the main collision note
         console.log(`Playing note ${note} with volume ${volume}`);
@@ -257,7 +257,7 @@ let mouseX = 0;
 let mouseY = 0;
 const MOUSE_INFLUENCE_RADIUS = 120;
 const REPULSION_STRENGTH = 5.0;
-const MAX_SPEED = 3.5;
+const MAX_SPEED = 2.8;
 
 // Create balls with different pastel colors
 const colors = [
@@ -329,7 +329,7 @@ class Ball {
         this.dx = (Math.random() - 0.5) * 2.0;
         this.dy = (Math.random() - 0.5) * 2.0;
         this.lastCollisionTime = 0;
-        this.collisionCooldown = 0.05;
+        this.collisionCooldown = 0.15;
         this.opacity = 1;
         this.isHovered = false;
     }
@@ -514,37 +514,10 @@ function animate() {
 window.addEventListener('load', () => {
     console.log('Window loaded');
     resizeCanvas();
-animate(); 
-    updateInteractionText();
+    animate(); 
 });
 
 window.addEventListener('resize', () => {
     console.log('Window resized');
     resizeCanvas();
-});
-
-// Create interaction text element
-const interactionTextContainer = document.createElement('div');
-interactionTextContainer.id = 'interaction-text';
-interactionTextContainer.style.position = 'fixed';
-interactionTextContainer.style.bottom = '2rem';
-interactionTextContainer.style.left = '50%';
-interactionTextContainer.style.transform = 'translateX(-50%)';
-interactionTextContainer.style.textAlign = 'center';
-interactionTextContainer.style.color = '#9BA0BC';
-interactionTextContainer.style.fontSize = '1rem';
-interactionTextContainer.style.fontFamily = "'Poppins', sans-serif";
-interactionTextContainer.style.textShadow = '0 1px 2px rgba(0,0,0,0.05)';
-document.body.appendChild(interactionTextContainer);
-
-// Update interaction text
-function updateInteractionText() {
-    const textElement = document.getElementById('interaction-text');
-    if (textElement) {
-        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-            textElement.textContent = "Touch to interact with the balls. Each collision creates a unique musical note.";
-        } else {
-            textElement.textContent = "Move your mouse to interact with the balls. Each collision creates a unique musical note.";
-        }
-    }
-} 
+}); 

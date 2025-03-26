@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%234A90E2'/></svg>">
-    <title>Sonic Balls</title>
+    <title>Tones of Thought</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         /* Reset and base styles */
@@ -37,18 +37,64 @@
         }
 
         /* Logo styles */
-        .logo {
+        .logo-container {
             position: fixed;
             top: 2rem;
             right: 2rem;
             z-index: 1000;
+        }
+
+        .logo {
             width: 40px;
             height: 40px;
             transition: transform 0.3s ease;
+            cursor: pointer;
         }
 
         .logo:hover {
             transform: scale(1.05);
+        }
+
+        .logo-popup {
+            position: absolute;
+            top: 50%;
+            right: 60px;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            font-size: 0.9rem;
+            color: #86868b;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container:hover .logo-popup {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .logo-popup::before {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-left: 8px solid rgba(255, 255, 255, 0.98);
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+
+        @media (max-width: 768px) {
+            .logo-popup {
+                display: none;
+            }
         }
 
         /* Container styles */
@@ -127,10 +173,29 @@
         h1 {
             font-size: 2.5rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             text-align: center;
             color: #1d1d1f;
             letter-spacing: -0.025em;
+        }
+
+        /* Subheader styles */
+        .subheader {
+            font-size: 1.125rem;
+            color: #86868b;
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .subheader p {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: #86868b;
         }
 
         /* Description styles */
@@ -168,10 +233,15 @@
     </style>
 </head>
 <body>
-    <svg class="logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 4 L36 36 L4 36 Z" fill="black"/>
-    </svg>
-    <h1>Sonic Balls</h1>
+    <div class="logo-container">
+        <svg class="logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4 L36 36 L4 36 Z" fill="black"/>
+        </svg>
+        <div class="logo-popup">an experiment in vibe coding from roscoe williamson</div>
+    </div>
+    <h1>Tones of Thought</h1>
+    <div class="subheader">
+    </div>
     <div class="container">
         <canvas id="canvas"></canvas>
     </div>
