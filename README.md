@@ -19,7 +19,7 @@ An interactive web experiment featuring bouncing balls that create musical notes
 
 ## Live Demo
 
-[View the live demo](https://your-vercel-url.vercel.app)
+[View the live demo](https://interactive-musical-balls.vercel.app/)
 
 ## Local Development
 
