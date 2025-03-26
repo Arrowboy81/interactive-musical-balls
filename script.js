@@ -1,6 +1,43 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
+// Audio setup
+let audioContext;
+let masterGainNode;
+let reverbNode;
+let audioInitialized = false;
+
+// Add click/touch to start overlay
+const overlay = document.createElement('div');
+overlay.style.position = 'fixed';
+overlay.style.top = '0';
+overlay.style.left = '0';
+overlay.style.width = '100%';
+overlay.style.height = '100%';
+overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+overlay.style.color = 'white';
+overlay.style.display = 'flex';
+overlay.style.justifyContent = 'center';
+overlay.style.alignItems = 'center';
+overlay.style.zIndex = '1000';
+overlay.style.cursor = 'pointer';
+overlay.style.fontFamily = "'Poppins', sans-serif";
+overlay.innerHTML = '<div style="text-align: center; padding: 20px;"><h2>Click or Touch to Start</h2></div>';
+document.body.appendChild(overlay);
+
+// Initialize audio on user interaction
+function startAudio() {
+    if (!audioInitialized) {
+        initAudio();
+        audioInitialized = true;
+        overlay.style.display = 'none';
+    }
+}
+
+// Add event listeners for audio initialization
+overlay.addEventListener('click', startAudio);
+overlay.addEventListener('touchstart', startAudio, { passive: false });
+
 // Prevent default touch behaviors
 canvas.addEventListener('touchstart', function(e) {
     e.preventDefault();
@@ -14,18 +51,6 @@ canvas.addEventListener('touchmove', function(e) {
     mouseY = touch.clientY - rect.top;
 }, { passive: false });
 
-canvas.addEventListener('touchend', function(e) {
-    e.preventDefault();
-    mouseX = -1000;
-    mouseY = -1000;
-}, { passive: false });
-
-// Audio setup
-let audioContext;
-let masterGainNode;
-let reverbNode;
-let drumLoopInterval;
-
 // Musical scale in C major (frequencies in Hz)
 const C_MAJOR_SCALE = {
     C: 261.63,  // Middle C
@@ -35,11 +60,6 @@ const C_MAJOR_SCALE = {
     G: 392.00,  // G
     A: 440.00,  // A
     B: 493.88   // B
-};
-
-// Drum samples
-const DRUM_SAMPLES = {
-    kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]  // Kick on every beat (4/4)
 };
 
 // Create reverb impulse response
@@ -73,7 +93,7 @@ function initAudio() {
     
     // Create reverb mix control
     const reverbGain = audioContext.createGain();
-    reverbGain.gain.value = 0.5; // Increased from 0.3 to 0.5 for more reverb
+    reverbGain.gain.value = 0.5;
     
     // Connect nodes
     masterGainNode.connect(audioContext.destination);
@@ -86,7 +106,7 @@ function initAudio() {
 
 // Create collision sound
 function createCollisionSound(velocity, x, y) {
-    if (!audioContext) return;
+    if (!audioContext || !audioInitialized) return;
     
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
@@ -149,132 +169,12 @@ function createCollisionSound(velocity, x, y) {
     oscillator.stop(audioContext.currentTime + 1.2);
 }
 
-// Create drum sounds
-function createDrumSound(type) {
-    if (!audioContext) return;
-    
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    const filter = audioContext.createBiquadFilter();
-    
-    switch(type) {
-        case 'kick':
-            oscillator.type = 'sine';
-            // Lower starting frequency for deeper sound
-            oscillator.frequency.setValueAtTime(80, audioContext.currentTime);
-            // Slower frequency drop for more sustain
-            oscillator.frequency.exponentialRampToValueAtTime(20, audioContext.currentTime + 0.8);
-            
-            // Set up filter for more character
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(200, audioContext.currentTime);
-            filter.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.8);
-            filter.Q.setValueAtTime(10, audioContext.currentTime);
-            
-            // Longer sustain with slower decay
-            gainNode.gain.setValueAtTime(0.375, audioContext.currentTime);
-            gainNode.gain.setTargetAtTime(0.375 * 0.5, audioContext.currentTime + 0.1, 0.3);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.8);
-            
-            oscillator.connect(filter);
-            filter.connect(gainNode);
-            gainNode.connect(masterGainNode);
-            
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.8);
-            break;
-    }
-}
-
-// Start drum loop
-function startDrumLoop() {
-    if (drumLoopInterval) return;
-    
-    const BPM = 100;
-    const beatDuration = 60 / BPM;
-    const stepDuration = beatDuration / 4; // 16th notes
-    
-    let step = 0;
-    
-    drumLoopInterval = setInterval(() => {
-        if (DRUM_SAMPLES.kick[step]) createDrumSound('kick');
-        
-        step = (step + 1) % 16;
-    }, stepDuration * 1000);
-}
-
-// Add start button
-const startButton = document.createElement('button');
-startButton.textContent = 'Start';
-startButton.style.position = 'fixed';
-startButton.style.top = '20px';
-startButton.style.left = '20px';
-startButton.style.zIndex = '1000';
-startButton.style.padding = '10px 20px';
-startButton.style.fontSize = '16px';
-startButton.style.fontFamily = "'Poppins', sans-serif";
-startButton.style.fontWeight = '500';
-startButton.style.cursor = 'pointer';
-startButton.style.backgroundColor = '#4ECDC4';
-startButton.style.border = 'none';
-startButton.style.borderRadius = '5px';
-startButton.style.color = 'white';
-document.body.appendChild(startButton);
-
-// Add stop button
-const stopButton = document.createElement('button');
-stopButton.textContent = 'Stop';
-stopButton.style.position = 'fixed';
-stopButton.style.top = '20px';
-stopButton.style.left = '120px'; // Position it to the right of the start button
-stopButton.style.zIndex = '1000';
-stopButton.style.padding = '10px 20px';
-stopButton.style.fontSize = '16px';
-stopButton.style.fontFamily = "'Poppins', sans-serif";
-stopButton.style.fontWeight = '500';
-stopButton.style.cursor = 'pointer';
-stopButton.style.backgroundColor = '#FF3B30'; // Red color for stop
-stopButton.style.border = 'none';
-stopButton.style.borderRadius = '5px';
-stopButton.style.color = 'white';
-stopButton.style.display = 'none'; // Initially hidden
-document.body.appendChild(stopButton);
-
-// Function to stop all audio
-function stopAllAudio() {
-    // Stop the drum loop
-    if (drumLoopInterval) {
-        clearInterval(drumLoopInterval);
-        drumLoopInterval = null;
-    }
-    
-    // Close and reset audio context
-    if (audioContext) {
-        audioContext.close();
-        audioContext = null;
-        masterGainNode = null;
-        reverbNode = null;
-    }
-    
-    stopButton.style.display = 'none';
-    startButton.style.display = 'block';
-}
-
-startButton.addEventListener('click', () => {
-    initAudio();
-    startDrumLoop();
-    startButton.style.display = 'none';
-    stopButton.style.display = 'block';
-});
-
-stopButton.addEventListener('click', stopAllAudio);
-
 // Mouse position tracking
 let mouseX = 0;
 let mouseY = 0;
 const MOUSE_INFLUENCE_RADIUS = 100;
-const REPULSION_STRENGTH = 3.75; // Increased from 2.5 to 3.75 (50% faster)
-const MAX_SPEED = 2.25; // Increased from 1.5 to 2.25 (50% faster)
+const REPULSION_STRENGTH = 3.75;
+const MAX_SPEED = 2.25;
 
 // Set canvas size to match container
 function resizeCanvas() {
@@ -364,7 +264,7 @@ class Ball {
         this.opacity = this.isHovered ? 0.8 : 1;
 
         // Add more drag to prevent excessive speeds
-        this.dx *= 0.998; // Adjusted from 0.997 to 0.998 for less drag
+        this.dx *= 0.998;
         this.dy *= 0.998;
 
         // Limit speed after all forces are applied
@@ -373,9 +273,15 @@ class Ball {
         // Bounce off walls
         if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
             this.dx = -this.dx;
+            if (audioInitialized) {
+                createCollisionSound(Math.abs(this.dx) * 100, this.x, this.y);
+            }
         }
         if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
             this.dy = -this.dy;
+            if (audioInitialized) {
+                createCollisionSound(Math.abs(this.dy) * 100, this.x, this.y);
+            }
         }
 
         // Keep balls within bounds
@@ -420,16 +326,17 @@ class Ball {
                 ball.y += overlap * sin;
 
                 // Play collision sound
-                const currentTime = audioContext ? audioContext.currentTime : 0;
-                if (currentTime - this.lastCollisionTime > this.collisionCooldown) {
-                    const relativeVelocity = Math.sqrt(
-                        Math.pow(this.dx - ball.dx, 2) + 
-                        Math.pow(this.dy - ball.dy, 2)
-                    );
-                    // Use the average position of the two colliding balls
-                    const avgX = (this.x + ball.x) / 2;
-                    createCollisionSound(relativeVelocity, avgX, 0);
-                    this.lastCollisionTime = currentTime;
+                if (audioInitialized) {
+                    const currentTime = audioContext ? audioContext.currentTime : 0;
+                    if (currentTime - this.lastCollisionTime > this.collisionCooldown) {
+                        const relativeVelocity = Math.sqrt(
+                            Math.pow(this.dx - ball.dx, 2) + 
+                            Math.pow(this.dy - ball.dy, 2)
+                        );
+                        const avgX = (this.x + ball.x) / 2;
+                        createCollisionSound(relativeVelocity * 100, avgX, 0);
+                        this.lastCollisionTime = currentTime;
+                    }
                 }
             }
         });

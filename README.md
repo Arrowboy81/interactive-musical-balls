@@ -1,32 +1,48 @@
-# Interactive Balls with Audio
+# Sonic Balls
 
-An interactive web experiment featuring bouncing balls that create musical notes on collision, accompanied by a rhythmic drum beat.
+An interactive web-based physics simulation where bouncing balls create musical notes on collision. Each ball generates unique sounds based on its position and velocity, creating an engaging audiovisual experience.
 
 ## Features
 
-- Interactive bouncing balls that respond to mouse movement
-- Musical notes generated from ball collisions
-- Customizable drum beat with start/stop controls
-- Modern, clean UI with smooth animations
-- Responsive design that works on all screen sizes
+- Interactive physics-based ball simulation
+- Musical notes generated on ball collisions
+- Mouse/touch interaction to repel balls
+- Modern, clean UI design
+- Responsive layout
+- WebAudio API for rich sound synthesis
+
+## Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/YOUR_USERNAME/sonic-balls.git
+cd sonic-balls
+```
+
+2. Serve the files using a local web server. For example, using Python:
+```bash
+python -m http.server 8080
+```
+
+3. Open your browser and navigate to:
+```
+http://localhost:8080
+```
+
+## How to Use
+
+- Click/Touch anywhere to start the audio
+- Move your mouse or touch the screen to interact with the balls
+- Each ball collision creates a musical note based on its position and velocity
+- The pitch of the notes follows a C major scale
 
 ## Technologies Used
 
 - HTML5 Canvas
 - Web Audio API
-- Vanilla JavaScript
-- CSS3 with modern features
-
-## Live Demo
-
-[View the live demo](https://interactive-musical-balls.vercel.app/)
-
-## Local Development
-
-1. Clone the repository
-2. Open `index.html` in your browser
-3. Click "Start Beat" to begin the interactive experience
+- JavaScript (ES6+)
+- CSS3
 
 ## License
 
-MIT 
+MIT License - feel free to use and modify for your own projects! 
