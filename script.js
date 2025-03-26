@@ -1,6 +1,25 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
+// Prevent default touch behaviors
+canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    mouseX = touch.clientX - rect.left;
+    mouseY = touch.clientY - rect.top;
+}, { passive: false });
+
+canvas.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    mouseX = -1000;
+    mouseY = -1000;
+}, { passive: false });
+
 // Audio setup
 let audioContext;
 let masterGainNode;
