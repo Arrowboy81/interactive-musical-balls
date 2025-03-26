@@ -205,7 +205,7 @@ function startDrumLoop() {
 
 // Add start button
 const startButton = document.createElement('button');
-startButton.textContent = 'Start Beat';
+startButton.textContent = 'Start';
 startButton.style.position = 'fixed';
 startButton.style.top = '20px';
 startButton.style.left = '20px';
@@ -223,7 +223,7 @@ document.body.appendChild(startButton);
 
 // Add stop button
 const stopButton = document.createElement('button');
-stopButton.textContent = 'Stop Beat';
+stopButton.textContent = 'Stop';
 stopButton.style.position = 'fixed';
 stopButton.style.top = '20px';
 stopButton.style.left = '120px'; // Position it to the right of the start button
@@ -240,14 +240,24 @@ stopButton.style.color = 'white';
 stopButton.style.display = 'none'; // Initially hidden
 document.body.appendChild(stopButton);
 
-// Function to stop the drum loop
-function stopDrumLoop() {
+// Function to stop all audio
+function stopAllAudio() {
+    // Stop the drum loop
     if (drumLoopInterval) {
         clearInterval(drumLoopInterval);
         drumLoopInterval = null;
-        stopButton.style.display = 'none';
-        startButton.style.display = 'block';
     }
+    
+    // Close and reset audio context
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        masterGainNode = null;
+        reverbNode = null;
+    }
+    
+    stopButton.style.display = 'none';
+    startButton.style.display = 'block';
 }
 
 startButton.addEventListener('click', () => {
@@ -257,7 +267,7 @@ startButton.addEventListener('click', () => {
     stopButton.style.display = 'block';
 });
 
-stopButton.addEventListener('click', stopDrumLoop);
+stopButton.addEventListener('click', stopAllAudio);
 
 // Mouse position tracking
 let mouseX = 0;

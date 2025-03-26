@@ -184,7 +184,7 @@
         function updateInteractionText() {
             const textElement = document.getElementById('interaction-text');
             if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-                textElement.textContent = "Touch and drag to interact with the balls. Each collision creates a unique musical note.";
+                textElement.textContent = "Touch to interact with the balls. Each collision creates a unique musical note.";
             } else {
                 textElement.textContent = "Move your mouse to interact with the balls. Each collision creates a unique musical note.";
             }
