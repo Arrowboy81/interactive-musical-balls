@@ -514,7 +514,7 @@ function animate() {
 window.addEventListener('load', () => {
     console.log('Window loaded');
     resizeCanvas();
-    animate(); 
+animate(); 
 });
 
 window.addEventListener('resize', () => {
