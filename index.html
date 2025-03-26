@@ -158,17 +158,30 @@
 </head>
 <body>
     <svg class="logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="20" r="18" stroke="#0071e3" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="20" cy="20" r="12" stroke="#0071e3" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="20" cy="20" r="6" fill="#0071e3"/>
-        <path d="M20 2 L20 38" stroke="#0071e3" stroke-width="2" stroke-linecap="round"/>
-        <path d="M2 20 L38 20" stroke="#0071e3" stroke-width="2" stroke-linecap="round"/>
+        <path d="M20 4 L36 36 L4 36 Z" fill="black"/>
     </svg>
     <h1>Interactive Balls</h1>
-    <p>Move your mouse to interact with the balls. Each collision creates a unique musical note.</p>
+    <p id="interaction-text">Move your mouse to interact with the balls. Each collision creates a unique musical note.</p>
     <div class="container">
         <canvas id="canvas"></canvas>
     </div>
+    <script>
+        // Detect if device has touch capability
+        function updateInteractionText() {
+            const textElement = document.getElementById('interaction-text');
+            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                textElement.textContent = "Touch and drag to interact with the balls. Each collision creates a unique musical note.";
+            } else {
+                textElement.textContent = "Move your mouse to interact with the balls. Each collision creates a unique musical note.";
+            }
+        }
+
+        // Update text when page loads
+        window.addEventListener('load', updateInteractionText);
+        
+        // Update text when window is resized
+        window.addEventListener('resize', updateInteractionText);
+    </script>
     <script src="script.js"></script>
 </body>
 </html> 
